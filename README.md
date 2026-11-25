@@ -421,7 +421,7 @@ docker run --rm -p 8080:8080 -e OPENROUTER_API_KEY=... -e OPENROUTER_BASE_URL=..
 Inhalt von `BERICHT.md`:
 
 1. Strategie je Fragekategorie: Woran erkennt man eine Maschine, und was wurde dagegen getan?
-2. Eigene Testfragen: Ergebnisse vorher und nachher, was hat nicht funktioniert?
+2. Eigene Testfragen: Wie reagiert das Programm darauf, was hat nicht funktioniert?
 3. Arbeit mit OpenCode: Wo hat es geholfen, wo musste nachgesteuert werden?
 4. Weitere Ideen: Was wurde nicht umgesetzt, könnte im Gespräch aber helfen?
 
