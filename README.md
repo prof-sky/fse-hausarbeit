@@ -23,23 +23,17 @@ dagegen Tricks einbauen und testen.
 
 ## Der Ablauf im Überblick
 
-**Teil 1: Lokal auf dem eigenen Rechner**
+1. Schlüssel beantragen, Schlüssel und Persona-Vorgabe notieren
+2. Eigenes Repository aus der Vorlage anlegen, bei GitHub einrichten und klonen
+3. OpenCode mit dem Schlüssel starten
+4. Das Chat-Programm mit OpenCode bauen
+5. Lokal bauen, starten und mit `vertragstest.py` prüfen
+6. Mit `git push` hochladen, GitHub prüft automatisch
+7. Persona und Strategie verbessern, mit eigenen Testfragen messen, Schritte 5 und 6 wiederholen
 
-1. Vorbereiten: Schlüssel beantragen, Repository anlegen, OpenCode starten
-2. Beispiel: wie das fertige Programm benutzt wird
-3. Die Regeln, die das Programm einhalten muss
-4. Wie das Programm aufgebaut ist
-5. Wie es das Sprachmodell fragt
-6. Wie es als Docker-Image verpackt wird
-7. Lokal testen, Strategie verbessern, wieder testen
-
-**Teil 2: In der Cloud bei GitHub**
-
-1. Repository einrichten: Schlüssel hinterlegen, Dozent einladen
-2. Hochladen: GitHub prüft automatisch die Regeln
-3. Optional: das Programm für bis zu eine Stunde online stellen
-
-**Abgabe:** Zum Stichtag liegt alles im eigenen GitHub-Repository.
+Programmiert und getestet wird auf dem eigenen Rechner. Jeder Zwischenstand
+wird in das eigene, private GitHub-Repository hochgeladen; GitHub baut und
+testet ihn dort automatisch. **Abgabe:** Was zum Stichtag im Repository liegt.
 
 ## Rahmen
 
@@ -72,7 +66,7 @@ dagegen Tricks einbauen und testen.
 | `index.html` | Fertige Chat-Seite für den Browser. |
 | `opencode.jsonc` | Einstellungen für OpenCode, passend zum eigenen Schlüssel. |
 | `vertragstest.py` | Prüfprogramm: testet, ob das eigene Programm die Regeln (den *Vertrag*) einhält. |
-| `.github/workflows/` | Zwei Abläufe, die GitHub automatisch ausführt (siehe Teil 2). |
+| `.github/workflows/` | Zwei Abläufe, die GitHub automatisch ausführt (siehe Schritt 6). Nicht ändern. |
 | `.gitignore` | Sorgt dafür, dass eine Datei `.env` mit Schlüssel nicht versehentlich bei GitHub landet. |
 
 Das Chat-Programm selbst ist **nicht** vorgegeben. Selbst zu erstellen:
@@ -80,28 +74,53 @@ Programmcode, `Dockerfile`, `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`,
 
 ---
 
-## Teil 1: Lokal auf dem eigenen Rechner
+## Schritt 1: Schlüssel und Persona-Vorgabe abholen
 
-### 1. Vorbereiten
+Den Schlüssel über das Formular beantragen, das in der Vorlesung bekanntgegeben
+wird (dabei den GitHub-Benutzernamen angeben). Der Schlüssel ist eine Art
+Passwort, mit dem das Programm das Sprachmodell benutzen darf. Dort steht auch
+die persönliche Vorgabe für die Persona. **Beides sofort notieren, es wird nur
+einmal angezeigt.**
 
-1. **Schlüssel beantragen** über das Formular, das in der Vorlesung bekanntgegeben
-   wird (dabei den GitHub-Benutzernamen angeben). Der Schlüssel ist eine Art
-   Passwort, mit dem das Programm das Sprachmodell benutzen darf. Dort steht
-   auch die persönliche Vorgabe für die Persona; beides notieren.
-2. **Eigenes Repository anlegen:** Auf dieser Seite oben rechts
-   **Use this template → Create a new repository** wählen.
-   Name genau **`fse-hausarbeit`**, Sichtbarkeit **Private**.
-3. **Auf den eigenen Rechner holen und OpenCode starten:**
+## Schritt 2: Eigenes Repository anlegen und einrichten
+
+1. Auf dieser Seite oben rechts **Use this template → Create a new repository**
+   wählen. Name genau **`fse-hausarbeit`**, Sichtbarkeit **Private**.
+2. Im neuen Repository auf GitHub, einmalig:
+   - *Settings → Secrets and variables → Actions → New repository secret*:
+     Name `OPENROUTER_API_KEY`, Wert = der eigene Schlüssel. Damit kann GitHub
+     das Programm nach jedem Hochladen starten (Schritt 6), ohne dass der
+     Schlüssel im Code steht. Collaborators (auch der Dozent) können ihn nicht lesen.
+   - *Settings → Collaborators*: den Account **`prof-sky`** einladen.
+3. Auf den eigenen Rechner holen:
    ```bash
    git clone https://github.com/<eigener-name>/fse-hausarbeit.git
    cd fse-hausarbeit
-   export OPENROUTER_API_KEY=sk-or-v1-...    # Schlüssel nur so setzen, nie in eine Datei
-   opencode
    ```
 
 Voraussetzungen auf dem Rechner: Git, Docker, Python und OpenCode.
 
-### 2. Beispiel: So soll es am Ende funktionieren
+## Schritt 3: OpenCode mit dem Schlüssel starten
+
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-...    # Schlüssel nur so setzen, nie in eine Datei
+opencode
+```
+
+OpenCode aus demselben Terminal starten, in dem der Schlüssel gesetzt wurde.
+Alternativ einmalig `opencode auth login` ausführen, OpenRouter wählen und den
+Schlüssel einfügen. Modell und Rechte sind in `opencode.jsonc` schon passend
+eingestellt. OpenCode und das eigene Programm zahlen aus demselben Guthaben.
+
+## Schritt 4: Das Chat-Programm mit OpenCode bauen
+
+OpenCode bekommt den Auftrag, das Chat-Programm samt `Dockerfile` zu bauen.
+Was es können muss, steht in den folgenden Abschnitten. Bewährt hat sich, in
+Etappen vorzugehen: erst `/health`, dann `/chat` mit Gedächtnis, dann das
+Sprachmodell, zuletzt Docker. Regeln für OpenCode in `AGENTS.md` festhalten und
+nach jeder Etappe committen.
+
+### So soll es am Ende funktionieren
 
 So sieht es aus, wenn das fertige Programm auf dem eigenen Rechner läuft.
 Die Antworten hier sind ausgedacht; sie hängen von der eigenen Persona ab.
@@ -141,7 +160,7 @@ curl --get http://localhost:8080/chat --data-urlencode "session=demo" \
 # {"reply": "haha nee, wie kommst du da drauf"}
 ```
 
-### 3. Die Regeln (Schnittstellenvertrag)
+### Die Regeln (Schnittstellenvertrag)
 
 Der „Vertrag“ legt fest, wie das Programm von außen angesprochen wird. Genau
 das prüft die Bewertung automatisch. Wie es innen arbeitet, ist frei.
@@ -176,7 +195,7 @@ Regeln für `/chat`:
   das Programm nicht abstürzen. Es antwortet trotzdem normal (Statuscode 200)
   mit einer passenden Ausrede, z. B. „sorry, mein internet spinnt grad“.
 
-### 4. Wie das Programm aufgebaut ist
+### Wie das Programm aufgebaut ist
 
 Es gibt bewusst keinen fertigen Code. Jede Nachricht an `/chat` läuft aber
 in einem funktionierenden Programm durch dieselben fünf Schritte:
@@ -208,7 +227,7 @@ in einem funktionierenden Programm durch dieselben fünf Schritte:
 | Fehler des Modells | ins Protokoll (Log) schreiben, nie an das Gegenüber weitergeben |
 | Zwei Nachrichten gleichzeitig | Nachrichten derselben `session` nacheinander bearbeiten, sonst gerät das Gespräch durcheinander |
 
-### 5. Der Weg zum Sprachmodell
+### Der Weg zum Sprachmodell
 
 Um eine Antwort zu bekommen, schickt das eigene Programm eine Anfrage an
 OpenRouter. Diese Anfrage sieht anders aus als die an `/chat`: Die Daten
@@ -249,7 +268,7 @@ curl https://openrouter.ai/api/v1/chat/completions \
 | `"model": "<MODELL>"` mit dem Modell aus `opencode.jsonc` | Andere Modelle werden abgelehnt. |
 | `"reasoning": {"enabled": false}` | Sonst „denkt“ das Modell erst lange unsichtbar nach. Das kostet Zeit und Guthaben. |
 
-### 6. Docker-Image
+### Docker-Image
 
 Das Programm wird als Docker-Image abgegeben, damit es überall gleich läuft.
 Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
@@ -263,7 +282,7 @@ Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
   `docker run -e OPENROUTER_API_KEY ...`
 - Das Image muss mit `docker build .` ohne weitere Angaben bauen.
 
-### 7. Lokal testen
+## Schritt 5: Lokal bauen, starten und prüfen
 
 Nach jeder Änderung: in einem Terminal das Programm bauen und starten.
 
@@ -278,14 +297,12 @@ In einem zweiten Terminal die Regeln prüfen:
 python vertragstest.py
 ```
 
-`vertragstest.py` macht dieselben Regel-Prüfungen wie die Bewertung (Teil A).
-Ist hier alles grün, gehen in Teil A keine Punkte durch Formfehler verloren.
+`vertragstest.py` macht dieselben Regel-Prüfungen wie die Bewertung.
+Ist hier alles grün, gehen keine Punkte durch Formfehler verloren.
 Ausfälle des Sprachmodells simuliert erst die Bewertung; das Programm muss
 also selbst damit umgehen können.
 
-Danach im Browser `http://localhost:8080/` öffnen und selbst chatten, und mit
-den eigenen Testfragen (`eval/run_eval.py`) prüfen, ob die Strategie wirkt.
-Dann ändern und erneut messen.
+Danach im Browser `http://localhost:8080/` öffnen und selbst chatten.
 
 ### Typische Stolpersteine
 
@@ -304,25 +321,12 @@ Dann ändern und erneut messen.
 Mehr zu HTTP, Fehlerformat, Stabilität und Docker steht kompakt in den Folien
 zur Hausarbeit (Kapitel „Technische Grundlagen kompakt“).
 
----
-
-## Teil 2: In der Cloud bei GitHub
+## Schritt 6: Mit `git push` hochladen, GitHub prüft automatisch
 
 GitHub Actions führt im eigenen Repository automatisch Abläufe aus. Zwei davon
-liegen schon in der Vorlage (`.github/workflows/`). Sie laufen auf Rechnern von
-GitHub, nicht auf dem eigenen.
-
-### 1. Repository einrichten (einmalig)
-
-Im eigenen Repository auf GitHub:
-
-- *Settings → Secrets and variables → Actions → New repository secret*:
-  Name `OPENROUTER_API_KEY`, Wert = der eigene Schlüssel. So kann GitHub das
-  Programm starten, ohne dass der Schlüssel im Code steht. Collaborators
-  (auch der Dozent) können ihn nicht lesen.
-- *Settings → Collaborators*: den Account **`prof-sky`** einladen.
-
-### 2. Hochladen und automatisch prüfen
+liegen schon in der Vorlage (`.github/workflows/`, nicht ändern). Sie laufen
+auf Rechnern von GitHub, nicht auf dem eigenen, und brauchen das Secret aus
+Schritt 2.
 
 ```bash
 git add .
@@ -335,7 +339,7 @@ Nach jedem Hochladen baut GitHub das Image und lässt `vertragstest.py` laufen
 Commit heißt: Die Regeln sind erfüllt. Ein rotes Kreuz → anklicken, dort steht,
 was fehlgeschlagen ist.
 
-### 3. Optional: Programm online stellen
+### Optional: Programm online stellen
 
 Im eigenen Repository unter *Actions → Live-Dienst → Run workflow* starten
 (Datei `live.yml`). Nach etwa zwei Minuten erscheint eine Adresse wie
@@ -350,6 +354,18 @@ Programm auf diesem Weg zum Ausprobieren.
 Beides läuft im kostenlosen Kontingent von GitHub für private Repositories;
 ein Live-Lauf von 30 Minuten verbraucht davon etwa 33 Minuten. Die Nachrichten
 an das Modell gehen auf das eigene Guthaben.
+
+## Schritt 7: Verbessern und messen
+
+- Die Persona in `persona.md` ausarbeiten; Alter, Beruf und Wohnort aus der
+  persönlichen Vorgabe müssen dort stehen.
+- Eigene Testfragen in `eval/fragen.json` sammeln, mindestens 5 je Kategorie
+  (siehe *Was getestet wird*).
+- `eval/run_eval.py` stellt sie dem laufenden Programm; Antworten auswerten und
+  notieren.
+- Eine Sache ändern, erneut messen, Ergebnis notieren. Jeden besseren Stand wie
+  in Schritt 5 und 6 prüfen und hochladen.
+- Die notierten Ergebnisse gehören in den Bericht.
 
 ---
 
@@ -373,7 +389,7 @@ das als Richter einschätzt, ob Mensch oder Maschine antwortet.
 ### Abgabe
 
 Abgegeben wird über das **private GitHub-Repository `fse-hausarbeit`** aus
-Teil 1, nicht per Datei-Upload.
+Schritt 2, nicht per Datei-Upload.
 
 - Nur Repositories mit genau diesem Namen werden eingesammelt.
 - `prof-sky` muss als Collaborator eingeladen sein.
@@ -407,19 +423,7 @@ Inhalt von `BERICHT.md`:
 1. Strategie je Fragekategorie: Woran erkennt man eine Maschine, und was wurde dagegen getan?
 2. Eigene Testfragen: Ergebnisse vorher und nachher, was hat nicht funktioniert?
 3. Arbeit mit OpenCode: Wo hat es geholfen, wo musste nachgesteuert werden?
-4. Nachgedacht: `/chat` ist als `GET` festgelegt, obwohl jede Nachricht das
-   gespeicherte Gespräch verändert. Warum wäre `POST` nach den HTTP-Regeln richtiger?
-5. Nachgedacht: Nach Art. 50 der EU-KI-Verordnung müssen Chatbots offenlegen,
-   dass eine KI antwortet. Wo wäre so ein Programm außerhalb der Hausarbeit verboten?
-
-### Punkte
-
-| Teil | Anteil | Was geprüft wird |
-|---|---|---|
-| A Regeln und Stabilität | 40 % | automatisch: Bauen, Starten, `vertragstest.py`, Verhalten bei Ausfällen und vielen Anfragen, kein Schlüssel im Image, richtiges Modell, Reasoning aus |
-| B Menschlichkeit (absolut) | 20 % | automatisch: geheime Fragen, auffällige Merkmale, Richter |
-| B Menschlichkeit (Ranking) | 10 % | Platz im Kurs: oberes Viertel 10 %, zweites 7,5 %, drittes 5 %, unteres 2,5 % |
-| C Testfragen und Bericht | 30 % | von Hand |
+4. Weitere Ideen: Was wurde nicht umgesetzt, könnte im Gespräch aber helfen?
 
 ---
 
