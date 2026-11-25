@@ -4,7 +4,7 @@
 
 Gebaut wird ein kleines Chat-Programm, das im Gespräch so tut, als wäre es ein
 **Mensch**. Im Hintergrund antwortet ein Sprachmodell (eine KI wie ChatGPT),
-und zwar für alle dasselbe: `deepseek/deepseek-v4.1-flash`, erreichbar über
+und zwar für alle dasselbe (welches, steht unter *Rahmen*), erreichbar über
 den Anbieter OpenRouter.
 
 Programmiert wird nicht von Hand, sondern **mit OpenCode**, einem KI-Assistenten
@@ -44,11 +44,13 @@ dagegen Tricks einbauen und testen.
 ## Rahmen
 
 - Bearbeitung einzeln.
+- **Modell:** `deepseek/deepseek-v4.1-flash`. Das ist die einzige Stelle, an
+  der der Name steht; in den Beispielen unten steht dafür `<MODELL>`.
 - Jede Person bekommt einen eigenen Schlüssel mit begrenztem Guthaben
-  (Betrag siehe Vorlesung), gültig bis zur Klausur. Bei sparsamem Testen
-  reicht das für viele tausend Nachrichten.
-- Der Schlüssel funktioniert nur mit dem Modell `deepseek/deepseek-v4.1-flash`,
-  auch in OpenCode. Andere Modelle werden abgelehnt.
+  (z. B. 4 $), gültig bis zur Klausur. Bei sparsamem Testen reicht das für
+  viele tausend Nachrichten.
+- Der Schlüssel funktioniert nur mit diesem Modell, auch in OpenCode
+  (`opencode.jsonc` ist passend eingestellt). Andere Modelle werden abgelehnt.
 - Der Schlüssel ist persönlich und **gehört nie in den Code, ins Docker-Image
   oder zu GitHub**. Er wird erst beim Starten übergeben (als Umgebungsvariable).
 - Programmiersprache und Werkzeuge sind frei; empfohlen wird Python mit FastAPI.
@@ -212,7 +214,7 @@ POST https://openrouter.ai/api/v1/chat/completions
 Authorization: Bearer sk-or-v1-...          <- der eigene Schlüssel
 Content-Type: application/json
 
-{"model": "deepseek/deepseek-v4.1-flash",
+{"model": "<MODELL>",
  "reasoning": {"enabled": false},
  "messages": [{"role": "system", "content": "<Inhalt von persona.md>"},
               {"role": "user", "content": "Hallo"}]}
@@ -220,12 +222,13 @@ Content-Type: application/json
 
 Die Antwort des Modells steht in der Rückgabe unter `choices[0].message.content`.
 
-Zum Ausprobieren ohne eigenes Programm, direkt im Terminal:
+Zum Ausprobieren ohne eigenes Programm, direkt im Terminal (`<MODELL>` durch
+den Modellnamen aus *Rahmen* ersetzen):
 
 ```bash
 curl https://openrouter.ai/api/v1/chat/completions \
   -H "Authorization: Bearer $OPENROUTER_API_KEY" -H "Content-Type: application/json" \
-  -d '{"model": "deepseek/deepseek-v4.1-flash", "reasoning": {"enabled": false},
+  -d '{"model": "<MODELL>", "reasoning": {"enabled": false},
        "messages": [{"role": "user", "content": "Hallo"}]}'
 ```
 
@@ -234,7 +237,7 @@ curl https://openrouter.ai/api/v1/chat/completions \
 | Pflicht | Warum |
 |---|---|
 | Die Adresse aus der Umgebungsvariable `OPENROUTER_BASE_URL` lesen; ist sie nicht gesetzt, `https://openrouter.ai/api/v1` nehmen | Die Bewertung schaltet eine eigene Zwischenstation dazwischen, die mitzählt und Ausfälle simuliert. |
-| `"model": "deepseek/deepseek-v4.1-flash"` | Andere Modelle werden abgelehnt. |
+| `"model": "<MODELL>"` mit dem Modell aus *Rahmen* | Andere Modelle werden abgelehnt. |
 | `"reasoning": {"enabled": false}` | Sonst „denkt“ das Modell erst lange unsichtbar nach. Das kostet Zeit und Guthaben. |
 
 ### 6. Docker-Image
