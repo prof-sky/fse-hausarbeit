@@ -4,7 +4,7 @@
 
 Gebaut wird ein kleines Chat-Programm, das im Gespräch so tut, als wäre es ein
 **Mensch**. Im Hintergrund antwortet ein Sprachmodell (eine KI wie ChatGPT),
-und zwar für alle dasselbe (welches, steht unter *Rahmen*), erreichbar über
+und zwar für alle dasselbe (welches, steht in `opencode.jsonc`), erreichbar über
 den Anbieter OpenRouter.
 
 Programmiert wird nicht von Hand, sondern **mit OpenCode**, einem KI-Assistenten
@@ -44,8 +44,9 @@ dagegen Tricks einbauen und testen.
 ## Rahmen
 
 - Bearbeitung einzeln.
-- **Modell:** `deepseek/deepseek-v4.1-flash`. Das ist die einzige Stelle, an
-  der der Name steht; in den Beispielen unten steht dafür `<MODELL>`.
+- **Modell:** Der Name des vorgegebenen Modells steht in `opencode.jsonc`
+  (Eintrag `"model"`, ohne das vorangestellte `openrouter/`). In den Beispielen
+  unten steht dafür `<MODELL>`.
 - Jede Person bekommt einen eigenen Schlüssel mit begrenztem Guthaben
   (z. B. 4 $), gültig bis zur Klausur. Bei sparsamem Testen reicht das für
   viele tausend Nachrichten.
@@ -223,7 +224,7 @@ Content-Type: application/json
 Die Antwort des Modells steht in der Rückgabe unter `choices[0].message.content`.
 
 Zum Ausprobieren ohne eigenes Programm, direkt im Terminal (`<MODELL>` durch
-den Modellnamen aus *Rahmen* ersetzen):
+den Modellnamen aus `opencode.jsonc` ersetzen):
 
 ```bash
 curl https://openrouter.ai/api/v1/chat/completions \
@@ -237,7 +238,7 @@ curl https://openrouter.ai/api/v1/chat/completions \
 | Pflicht | Warum |
 |---|---|
 | Die Adresse aus der Umgebungsvariable `OPENROUTER_BASE_URL` lesen; ist sie nicht gesetzt, `https://openrouter.ai/api/v1` nehmen | Die Bewertung schaltet eine eigene Zwischenstation dazwischen, die mitzählt und Ausfälle simuliert. |
-| `"model": "<MODELL>"` mit dem Modell aus *Rahmen* | Andere Modelle werden abgelehnt. |
+| `"model": "<MODELL>"` mit dem Modell aus `opencode.jsonc` | Andere Modelle werden abgelehnt. |
 | `"reasoning": {"enabled": false}` | Sonst „denkt“ das Modell erst lange unsichtbar nach. Das kostet Zeit und Guthaben. |
 
 ### 6. Docker-Image
