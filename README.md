@@ -131,7 +131,8 @@ Pflichten für jeden Modellaufruf (die Bewertung prüft sie):
 
 ## Aufbau des Dienstes
 
-Es gibt bewusst keinen vorgegebenen Code. Ein Dienst, der den Vertrag erfüllt,
+Es gibt bewusst keinen vorgegebenen Code, Sprache und Framework sind frei.
+Ein Dienst, der den Vertrag erfüllt,
 arbeitet jede Nachricht an `/chat` in diesen Schritten ab:
 
 1. **Eingang prüfen:** `session` und `message` gegen die Regeln des Vertrags
@@ -148,11 +149,28 @@ arbeitet jede Nachricht an `/chat` in diesen Schritten ab:
 5. **Antwort nachbearbeiten:** entfernen, was eine Maschine verrät; dann
    Nachricht und Antwort an den Verlauf anhängen und `{"reply": "..."}` senden.
 
-Dazu kommen `GET /` (liefert `index.html` aus) und `GET /health`. Verpackt wird
-alles in ein Docker-Image: Python-Basisimage, Abhängigkeiten installieren, nur
-die benötigten Dateien kopieren (kein `COPY . .` ohne `.dockerignore`) und den
-Server auf `0.0.0.0:8080` starten. Der Schlüssel kommt erst beim Start mit
-`docker run -e OPENROUTER_API_KEY ...` hinzu.
+Dazu kommen `GET /` (liefert `index.html` aus) und `GET /health`.
+
+### Eckwerte, die sich bewährt haben
+
+| Thema | Empfehlung |
+|---|---|
+| Prüfung `session` | regulärer Ausdruck `^[A-Za-z0-9_-]{1,64}$` |
+| Prüfung `message` | vorhanden, nach Entfernen von Leerzeichen nicht leer, höchstens 500 Zeichen (nach URL-Dekodierung) |
+| Content-Type | `/` → `text/html`, `/health` und `/chat` → `application/json`, Fehler → `application/problem+json` |
+| Verlauf | Rollen `user` und `assistant` im Wechsel; Persona nicht im Verlauf speichern, sondern bei jedem Aufruf neu voranstellen |
+| Timeout je Modellaufruf | ca. 15 s; Timeout, Wiederholung und Pause zusammen unter 30 s |
+| Antwortlänge | `"max_tokens"` begrenzen (z. B. 300); spart Zeit und Guthaben |
+| Fehler der Sprach-API | Status und gekürzten Rumpf ins Log schreiben, nie an den Aufrufer weitergeben |
+| Gleichzeitige Anfragen | Nachrichten derselben `session` nacheinander verarbeiten, sonst vermischt sich der Verlauf |
+
+### Docker-Image
+
+- Basisimage der gewählten Sprache, Abhängigkeiten mit festen Versionen installieren.
+- Nur benötigte Dateien kopieren; kein `COPY . .` ohne `.dockerignore`, sonst landet eine lokale `.env` im Image.
+- Server auf `0.0.0.0:8080` starten, nicht auf `127.0.0.1` (sonst von außen nicht erreichbar).
+- Kein Schlüssel im Image: er kommt erst beim Start mit `docker run -e OPENROUTER_API_KEY ...` hinzu.
+- Das Image muss mit `docker build .` ohne weitere Argumente bauen (linux/amd64).
 
 ## Fragekategorien im Menschlichkeitstest
 
@@ -259,13 +277,11 @@ Die Hausarbeit startet vor den Blöcken Architektur und Qualität. Das nötige
 Wissen zu HTTP, Problem Details, Robustheit und Docker steht kompakt in Kapitel 2
 der Folien zur Hausarbeit. Typische Stolpersteine:
 
-- Der Dienst muss im Container auf `0.0.0.0` lauschen, nicht auf `127.0.0.1`,
-  sonst ist er von außen nicht erreichbar.
-- FastAPI prüft Pflichtparameter selbst und antwortet bei einem fehlenden mit
-  `422` und eigenem Format. Der Vertrag verlangt `400` mit Problem Details;
-  Parameter deshalb optional deklarieren (`= None`) und selbst prüfen.
-- Kein `COPY . .` ohne `.dockerignore`: eine lokale `.env` mit Schlüssel
-  landet sonst im Image.
+- Viele Frameworks prüfen Pflichtparameter selbst und antworten dann mit
+  eigenem Status und Format (FastAPI z. B. mit `422`). Der Vertrag verlangt
+  `400` mit Problem Details; Parameter deshalb optional deklarieren und selbst prüfen.
+- Ein nicht kodiertes `&` oder `?` in der Nachricht zerlegt die URL; beim
+  Selbsttest `curl --get --data-urlencode "message=..."` verwenden.
 - Timeout, Wiederholung und Pause zusammen müssen unter 30 Sekunden bleiben.
 - Der Schlüssel hat ein Ausgabenlimit. Endlosschleifen in eigenen Tests
   vermeiden und Antwortlängen begrenzen.
