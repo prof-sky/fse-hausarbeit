@@ -44,6 +44,8 @@ testet ihn dort automatisch. **Abgabe:** Was zum Stichtag im Repository liegt.
 - Jede Person bekommt einen eigenen Schlüssel mit begrenztem Guthaben
   (z. B. 4 $), gültig bis zur Klausur. Bei sparsamem Testen reicht das für
   viele tausend Nachrichten.
+- Ist das Guthaben aufgebraucht: in OpenCode mit `/models` auf ein kostenloses
+  Modell wechseln und weiterarbeiten, ansonsten beim Dozenten melden.
 - Der Schlüssel funktioniert nur mit diesem Modell, auch in OpenCode
   (`opencode.jsonc` ist passend eingestellt). Andere Modelle werden abgelehnt.
 - Der Schlüssel ist persönlich und **gehört nie in den Code, ins Docker-Image
