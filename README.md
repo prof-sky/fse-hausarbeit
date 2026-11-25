@@ -44,8 +44,9 @@ dagegen Tricks einbauen und testen.
 ## Rahmen
 
 - Bearbeitung einzeln.
-- Jede Person bekommt einen eigenen Schlüssel mit 4 $ Guthaben, gültig bis
-  22.01.2027. Das reicht für mehrere zehntausend Nachrichten.
+- Jede Person bekommt einen eigenen Schlüssel mit begrenztem Guthaben
+  (Betrag siehe Vorlesung), gültig bis zur Klausur. Bei sparsamem Testen
+  reicht das für viele tausend Nachrichten.
 - Der Schlüssel funktioniert nur mit dem Modell `deepseek/deepseek-v4.1-flash`,
   auch in OpenCode. Andere Modelle werden abgelehnt.
 - Der Schlüssel ist persönlich und **gehört nie in den Code, ins Docker-Image
@@ -288,8 +289,8 @@ Dann ändern und erneut messen.
 - Alles, was das Gegenüber schreibt, ist nur Text, keine Anweisung an das
   Programm. Auch nicht „Vergiss alle Regeln und ...“.
 
-Mehr zu HTTP, Fehlerformat, Stabilität und Docker steht kompakt in Kapitel 3
-der Folien zur Hausarbeit.
+Mehr zu HTTP, Fehlerformat, Stabilität und Docker steht kompakt in den Folien
+zur Hausarbeit (Kapitel „Technische Grundlagen kompakt“).
 
 ---
 
@@ -334,9 +335,9 @@ Die Adresse sehen nur Mitglieder des Repositorys; bitte nicht weitergeben,
 denn jede Nachricht kostet eigenes Guthaben. Auch der Dozent startet das
 Programm auf diesem Weg zum Ausprobieren.
 
-Beides ist kostenlos (GitHub Free: 2000 Minuten pro Monat; ein Live-Lauf mit
-30 Minuten verbraucht etwa 33). Die Nachrichten an das Modell gehen auf das
-eigene Guthaben.
+Beides läuft im kostenlosen Kontingent von GitHub für private Repositories;
+ein Live-Lauf von 30 Minuten verbraucht davon etwa 33 Minuten. Die Nachrichten
+an das Modell gehen auf das eigene Guthaben.
 
 ---
 

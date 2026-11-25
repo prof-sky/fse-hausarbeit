@@ -5,7 +5,7 @@
 # Start: Actions -> "Live-Dienst" -> "Run workflow" (geht auch für eingeladene Collaborators)
 # Die Adresse erscheint sofort als Status "Live-Dienst" am letzten Commit (Repo-Startseite,
 # Häkchen neben dem Commit -> Details). Die Zusammenfassung des Laufs zeigt sie erst am Ende.
-# Kosten: zählt zu den kostenlosen Actions-Minuten des Kontos (privates Repo, Free: 2000 min/Monat).
+# Kosten: zählt zu den kostenlosen Actions-Minuten des Kontos (privates Repo).
 name: Live-Dienst
 
 on:
