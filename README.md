@@ -47,7 +47,8 @@ testet ihn dort automatisch. **Abgabe:** Was zum Stichtag im Repository liegt.
 - Der Schlüssel funktioniert nur mit diesem Modell, auch in OpenCode
   (`opencode.jsonc` ist passend eingestellt). Andere Modelle werden abgelehnt.
 - Der Schlüssel ist persönlich und **gehört nie in den Code, ins Docker-Image
-  oder zu GitHub**. Er wird erst beim Starten übergeben (als Umgebungsvariable).
+  oder zu GitHub**. Lokal steht er nur in der Datei `.env` (siehe Schritt 5) und
+  wird erst beim Starten übergeben.
 - Programmiersprache und Werkzeuge sind frei; empfohlen wird Python mit FastAPI.
   Bewertet wird nur, wie das Programm von außen reagiert.
 - **Persönliche Vorgabe:** Mit dem Schlüssel gibt es eine Vorgabe für die
@@ -252,12 +253,13 @@ Content-Type: application/json
 
 Die Antwort des Modells steht in der Rückgabe unter `choices[0].message.content`.
 
-Zum Ausprobieren ohne eigenes Programm, direkt im Terminal (`<MODELL>` durch
-den Modellnamen aus `opencode.jsonc` ersetzen):
+Zum Ausprobieren ohne eigenes Programm, direkt im Terminal (Bash, Git Bash
+oder WSL; `<SCHLÜSSEL>` durch den eigenen Schlüssel und `<MODELL>` durch den
+Modellnamen aus `opencode.jsonc` ersetzen):
 
 ```bash
 curl https://openrouter.ai/api/v1/chat/completions \
-  -H "Authorization: Bearer $OPENROUTER_API_KEY" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <SCHLÜSSEL>" -H "Content-Type: application/json" \
   -d '{"model": "<MODELL>", "reasoning": {"enabled": false},
        "messages": [{"role": "user", "content": "Hallo"}]}'
 ```
@@ -281,28 +283,24 @@ Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
 - Das Programm muss auf `0.0.0.0:8080` lauschen. Mit `127.0.0.1` wäre es
   nur innerhalb des Containers erreichbar, also für niemanden von außen.
 - Kein Schlüssel im Image. Er kommt erst beim Starten dazu:
-  `docker run -e OPENROUTER_API_KEY ...`
+  `docker run --env-file .env ...`
 - Das Image muss mit `docker build .` ohne weitere Angaben bauen.
 
 ## Schritt 5: Lokal bauen, starten und prüfen
 
-Nach jeder Änderung in einem Terminal den Schlüssel setzen, das Programm bauen
-und starten. Der Schlüssel gilt nur in dem Terminal, in dem er gesetzt wurde.
+Einmalig im Ordner `fse-hausarbeit` eine Datei `.env` mit einer Zeile anlegen:
 
-macOS, Linux, WSL:
-
-```bash
-export OPENROUTER_API_KEY=sk-or-v1-...
-docker build -t mensch .
-docker run --rm -p 8080:8080 -e OPENROUTER_API_KEY mensch
+```text
+OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-Windows PowerShell:
+Die Datei steht in `.gitignore` und landet deshalb nicht bei GitHub; OpenCode
+darf sie laut `opencode.jsonc` nicht lesen. Dann nach jeder Änderung in einem
+Terminal das Programm bauen und starten (gleich unter Windows, macOS und Linux):
 
-```powershell
-$env:OPENROUTER_API_KEY="sk-or-v1-..."
+```bash
 docker build -t mensch .
-docker run --rm -p 8080:8080 -e OPENROUTER_API_KEY mensch
+docker run --rm -p 8080:8080 --env-file .env mensch
 ```
 
 In einem zweiten Terminal die Regeln prüfen (unter macOS und Linux heißt der
