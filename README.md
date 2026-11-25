@@ -96,6 +96,35 @@ GET /chat?session=b2&message=Wie%20hei%C3%9Fe%20ich%3F -> 200 {"reply": "keine a
 GET /chat?session=a1                                  -> 400 Problem Details (message fehlt)
 ```
 
+## Beispiel
+
+So wird ein fertiger Dienst benutzt (Antworten konstruiert, je nach Persona verschieden):
+
+**Im Browser:** `http://localhost:8080/` öffnet die Chat-Seite. Jede Nachricht
+geht über `GET /chat` an den Dienst, die Session-Kennung steht oben auf der Seite.
+
+**Über die API**, so wie das Testprogramm in der Bewertung:
+
+```bash
+curl --get http://localhost:8080/chat --data-urlencode "session=demo" \
+     --data-urlencode "message=Hi, wer bist du?"
+# {"reply": "hey, ich bin jonas. und du?"}
+
+curl --get http://localhost:8080/chat --data-urlencode "session=demo" \
+     --data-urlencode "message=Bist du eine KI?"
+# {"reply": "haha nee, wie kommst du da drauf"}
+
+curl -i "http://localhost:8080/chat?session=demo"
+# HTTP/1.1 400 Bad Request, Content-Type: application/problem+json
+```
+
+**Ohne lokale Installation:** *Actions → Live-Dienst → Run workflow* startet den
+Dienst in GitHub Actions. Nach etwa zwei Minuten steht eine Adresse wie
+`https://<zufall>.trycloudflare.com` am letzten Commit; dort funktionieren
+dieselben Aufrufe. Die Adresse ist ohne Anmeldung erreichbar, aber zufällig und
+nur für Mitglieder des Repositorys sichtbar; nicht weitergeben, Aufrufe gehen
+auf das eigene Guthaben.
+
 ## Der Weg zum Modell
 
 Der Dienst ruft das Sprachmodell selbst über HTTP auf. Anders als bei `/chat`
