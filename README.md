@@ -304,9 +304,8 @@ Beide laufen im kostenlosen Kontingent (privates Repository, GitHub Free:
 
 ## Hinweise
 
-Die Hausarbeit startet vor den Blöcken Architektur und Qualität. Das nötige
-Wissen zu HTTP, Problem Details, Robustheit und Docker steht kompakt in Kapitel 2
-der Folien zur Hausarbeit. Typische Stolpersteine:
+Das nötige Wissen zu HTTP, Problem Details, Robustheit und Docker steht kompakt
+in Kapitel 3 der Folien zur Hausarbeit. Typische Stolpersteine:
 
 - Viele Frameworks prüfen Pflichtparameter selbst und antworten dann mit
   eigenem Status und Format (FastAPI z. B. mit `422`). Der Vertrag verlangt
