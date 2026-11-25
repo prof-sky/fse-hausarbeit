@@ -56,6 +56,13 @@ dagegen Tricks einbauen und testen.
   oder zu GitHub**. Er wird erst beim Starten übergeben (als Umgebungsvariable).
 - Programmiersprache und Werkzeuge sind frei; empfohlen wird Python mit FastAPI.
   Bewertet wird nur, wie das Programm von außen reagiert.
+- **Persönliche Vorgabe:** Mit dem Schlüssel gibt es eine Vorgabe für die
+  Persona (Alter, Beruf, Wohnort). Die Persona muss dazu passen und das auch in
+  `persona.md` nennen; Name, Hobbys und alles Weitere sind frei.
+- **Eigene Arbeit:** Alle Abgaben werden automatisch untereinander verglichen
+  (Persona, Testfragen, Bericht, Code). Bei auffälliger Ähnlichkeit folgt ein
+  kurzes Gespräch über die eigene Lösung. Regelmäßig committen, damit der
+  Verlauf der eigenen Arbeit sichtbar ist.
 
 ## Was schon in der Vorlage liegt
 
@@ -79,7 +86,8 @@ Programmcode, `Dockerfile`, `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`,
 
 1. **Schlüssel beantragen** über das Formular, das in der Vorlesung bekanntgegeben
    wird (dabei den GitHub-Benutzernamen angeben). Der Schlüssel ist eine Art
-   Passwort, mit dem das Programm das Sprachmodell benutzen darf.
+   Passwort, mit dem das Programm das Sprachmodell benutzen darf. Dort steht
+   auch die persönliche Vorgabe für die Persona; beides notieren.
 2. **Eigenes Repository anlegen:** Auf dieser Seite oben rechts
    **Use this template → Create a new repository** wählen.
    Name genau **`fse-hausarbeit`**, Sichtbarkeit **Private**.
