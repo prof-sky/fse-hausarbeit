@@ -29,6 +29,7 @@ genau dafür Gegenstrategien zu bauen und zu testen.
 
 | Datei | Zweck |
 |---|---|
+| `persona.md` | Platzhalter für den System-Prompt (Persona); vom eigenen Dienst bei jedem Modellaufruf als Rolle `system` mitzuschicken und durch eine eigene Persona zu ersetzen. |
 | `index.html` | Fertige Chat-Seite für `GET /`; schickt jede Nachricht über `GET /chat` an den eigenen Dienst. |
 | `opencode.jsonc` | OpenCode-Konfiguration für den eigenen Schlüssel (nur das vorgegebene Modell). |
 | `vertragstest.py` | Dieselben Vertragsprüfungen wie in der Bewertung (Teil A), nur Python-Standardbibliothek. |
@@ -140,7 +141,7 @@ arbeitet jede Nachricht an `/chat` in diesen Schritten ab:
 2. **Verlauf holen:** Je `session` liegt im Speicher eine Liste der bisherigen
    Nachrichten (`{"role": ..., "content": ...}`). Anzahl der Sessions und Länge
    des Verlaufs begrenzen.
-3. **Anfrage bauen:** Persona als Nachricht mit Rolle `system`, dazu Fakten,
+3. **Anfrage bauen:** Persona (z. B. aus `persona.md`) als Nachricht mit Rolle `system`, dazu Fakten,
    die der Dienst selbst berechnet (z. B. Datum und Uhrzeit), dann der Verlauf
    und die neue Nachricht mit Rolle `user`.
 4. **Modell fragen:** `POST` wie unter *Der Weg zum Modell*, mit Timeout.
@@ -202,6 +203,7 @@ Inhalt im Wurzelverzeichnis zum Stichtag:
 ```text
 Dockerfile              baut mit "docker build ." ein lauffähiges Image (linux/amd64)
 <Quellcode>             eigener Dienst, dazu index.html aus der Vorlage
+persona.md              eigene Persona (Platzhalter aus der Vorlage ersetzt)
 AGENTS.md               Projektregeln für OpenCode
 opencode.jsonc          OpenCode-Konfiguration
 eval/fragen.json        eigene Testfragen, mindestens 5 je Kategorie
