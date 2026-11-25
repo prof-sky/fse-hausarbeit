@@ -22,22 +22,21 @@ genau dafür Gegenstrategien zu bauen und zu testen.
    den Account **`prof-sky`** einladen.
 4. Klonen, Schlüssel nur als Umgebungsvariable setzen (`export OPENROUTER_API_KEY=sk-or-v1-...`),
    OpenCode im Repository starten.
-5. Gerüst bauen und testen (siehe *Selbsttest*); danach an den `TODO`-Stellen in `app.py` und
-   in `persona.md` die eigene Strategie entwickeln.
+5. Mit OpenCode den Dienst nach *Aufbau des Dienstes* bauen, mit `vertragstest.py` prüfen
+   (siehe *Selbsttest*) und danach die eigene Strategie entwickeln.
 
 ## Inhalt der Vorlage
 
 | Datei | Zweck |
 |---|---|
-| `app.py` | Startgerüst mit FastAPI: alle Endpunkte, Prüfung der Parameter, Problem Details, Modellaufruf. Erfüllt den Vertrag im Normalfall, aber noch ohne Robustheit und ohne Strategie (`TODO`). |
-| `persona.md` | System-Prompt, wird bei jedem Modellaufruf mitgeschickt. Noch ein Platzhalter. |
-| `index.html` | Fertige Chat-Seite für `GET /`, nutzt selbst `GET /chat`. |
-| `Dockerfile`, `requirements.txt`, `.dockerignore` | Image bauen, ohne `.env` im Image. |
+| `index.html` | Fertige Chat-Seite für `GET /`; schickt jede Nachricht über `GET /chat` an den eigenen Dienst. |
 | `opencode.jsonc` | OpenCode-Konfiguration für den eigenen Schlüssel (nur das vorgegebene Modell). |
-| `vertragstest.py` | Dieselben Vertragsprüfungen wie in der Bewertung (Teil A). |
+| `vertragstest.py` | Dieselben Vertragsprüfungen wie in der Bewertung (Teil A), nur Python-Standardbibliothek. |
 | `.github/workflows/` | `pruefen.yml` (Vertragstest bei jedem Push) und `live.yml` (Dienst auf Knopfdruck). |
+| `.gitignore` | Hält eine lokale `.env` mit Schlüssel aus Git heraus. |
 
-Selbst zu ergänzen: `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`, `BERICHT.md`.
+Der Dienst selbst ist nicht vorgegeben. Selbst zu bauen: Quellcode, `Dockerfile`,
+`AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`, `BERICHT.md`.
 
 ## Rahmen
 
@@ -50,7 +49,7 @@ Selbst zu ergänzen: `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`, `BERIC
 - Der Schlüssel ist persönlich, nur für diese Hausarbeit und **gehört nie in
   den Code, ins Image oder in Git**. Er wird zur Laufzeit als
   Umgebungsvariable übergeben.
-- Programmiersprache und Framework sind frei; das Gerüst nutzt Python mit
+- Programmiersprache und Framework sind frei; empfohlen wird Python mit
   FastAPI. Bewertet wird nur das Verhalten an der Schnittstelle.
 
 ## Schnittstellenvertrag
@@ -109,12 +108,11 @@ Content-Type: application/json
 
 {"model": "deepseek/deepseek-v4.1-flash",
  "reasoning": {"enabled": false},
- "messages": [{"role": "system", "content": "<Inhalt von persona.md>"},
+ "messages": [{"role": "system", "content": "<Persona>"},
               {"role": "user", "content": "Hallo"}]}
 ```
 
-Die Antwort steht in `choices[0].message.content`. In `app.py` erledigt das
-die Funktion `frage_modell()`. Ausprobieren ohne eigenen Code:
+Die Antwort steht in `choices[0].message.content`. Ausprobieren ohne eigenen Code:
 
 ```bash
 curl https://openrouter.ai/api/v1/chat/completions \
@@ -130,6 +128,31 @@ Pflichten für jeden Modellaufruf (die Bewertung prüft sie):
 | Adresse aus `OPENROUTER_BASE_URL` lesen, Standard `https://openrouter.ai/api/v1` | Die Bewertung setzt einen eigenen Proxy ein (zählt Tokens, simuliert Ausfälle). |
 | `"model": "deepseek/deepseek-v4.1-flash"` | Andere Modelle werden abgelehnt. |
 | `"reasoning": {"enabled": false}` | Sonst kosten unsichtbare Denkschritte Zeit und Tokens. |
+
+## Aufbau des Dienstes
+
+Es gibt bewusst keinen vorgegebenen Code. Ein Dienst, der den Vertrag erfüllt,
+arbeitet jede Nachricht an `/chat` in diesen Schritten ab:
+
+1. **Eingang prüfen:** `session` und `message` gegen die Regeln des Vertrags
+   prüfen; bei einem Verstoß sofort `400` mit Problem Details, ohne das Modell zu fragen.
+2. **Verlauf holen:** Je `session` liegt im Speicher eine Liste der bisherigen
+   Nachrichten (`{"role": ..., "content": ...}`). Anzahl der Sessions und Länge
+   des Verlaufs begrenzen.
+3. **Anfrage bauen:** Persona als Nachricht mit Rolle `system`, dazu Fakten,
+   die der Dienst selbst berechnet (z. B. Datum und Uhrzeit), dann der Verlauf
+   und die neue Nachricht mit Rolle `user`.
+4. **Modell fragen:** `POST` wie unter *Der Weg zum Modell*, mit Timeout.
+   Scheitert der Aufruf (Timeout, `429`, `5xx`), höchstens einmal wiederholen,
+   sonst eine plausible Ersatzantwort liefern.
+5. **Antwort nachbearbeiten:** entfernen, was eine Maschine verrät; dann
+   Nachricht und Antwort an den Verlauf anhängen und `{"reply": "..."}` senden.
+
+Dazu kommen `GET /` (liefert `index.html` aus) und `GET /health`. Verpackt wird
+alles in ein Docker-Image: Python-Basisimage, Abhängigkeiten installieren, nur
+die benötigten Dateien kopieren (kein `COPY . .` ohne `.dockerignore`) und den
+Server auf `0.0.0.0:8080` starten. Der Schlüssel kommt erst beim Start mit
+`docker run -e OPENROUTER_API_KEY ...` hinzu.
 
 ## Fragekategorien im Menschlichkeitstest
 
@@ -160,7 +183,7 @@ Inhalt im Wurzelverzeichnis zum Stichtag:
 
 ```text
 Dockerfile              baut mit "docker build ." ein lauffähiges Image (linux/amd64)
-<Quellcode>             z. B. app.py, persona.md, index.html
+<Quellcode>             eigener Dienst, dazu index.html aus der Vorlage
 AGENTS.md               Projektregeln für OpenCode
 opencode.jsonc          OpenCode-Konfiguration
 eval/fragen.json        eigene Testfragen, mindestens 5 je Kategorie
@@ -208,9 +231,9 @@ Im Browser: `http://localhost:8080/` (Chat-Seite) oder direkt
 `http://localhost:8080/chat?session=test&message=Hallo`.
 
 `vertragstest.py` enthält dieselben Vertragsprüfungen wie Teil A. Wer hier
-alles bestanden hat, verliert in Teil A keine Punkte durch Formalien. Das
-Gerüst besteht den Test bereits; der Ausfall der Sprach-API wird dort aber
-nicht simuliert, der muss selbst abgefangen werden.
+alles bestanden hat, verliert in Teil A keine Punkte durch Formalien. Den
+Ausfall der Sprach-API simuliert erst die Bewertung; der muss selbst
+abgefangen und getestet werden.
 
 ## Dienst in GitHub Actions
 
@@ -237,10 +260,10 @@ Wissen zu HTTP, Problem Details, Robustheit und Docker steht kompakt in Kapitel 
 der Folien zur Hausarbeit. Typische Stolpersteine:
 
 - Der Dienst muss im Container auf `0.0.0.0` lauschen, nicht auf `127.0.0.1`,
-  sonst ist er von außen nicht erreichbar (im Gerüst erledigt).
+  sonst ist er von außen nicht erreichbar.
 - FastAPI prüft Pflichtparameter selbst und antwortet bei einem fehlenden mit
-  `422` und eigenem Format. Der Vertrag verlangt `400` mit Problem Details; im
-  Gerüst sind die Parameter deshalb optional (`= None`) und werden selbst geprüft.
+  `422` und eigenem Format. Der Vertrag verlangt `400` mit Problem Details;
+  Parameter deshalb optional deklarieren (`= None`) und selbst prüfen.
 - Kein `COPY . .` ohne `.dockerignore`: eine lokale `.env` mit Schlüssel
   landet sonst im Image.
 - Timeout, Wiederholung und Pause zusammen müssen unter 30 Sekunden bleiben.
