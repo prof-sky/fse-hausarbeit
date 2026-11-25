@@ -3,7 +3,7 @@
 // Der OpenRouter-Schlüssel aus der Hausarbeit gilt nur für das unten bei "model" eingetragene Modell;
 // jedes andere Modell wird von OpenRouter abgelehnt. Deshalb ist auch "small_model"
 // (Titel, Zusammenfassungen) auf dieses Modell gesetzt.
-// Schlüssel nur als Umgebungsvariable setzen: export OPENROUTER_API_KEY=sk-or-v1-...
+// Schlüssel einmalig mit "opencode auth login" hinterlegen (OpenRouter wählen).
 // Berechtigungen im Format V2 wie in FSE_LLM_2; bei älteren OpenCode-Versionen
 // heißt der Schlüssel "permission" (Objekt).
 {
@@ -12,7 +12,6 @@
   "small_model": "openrouter/deepseek/deepseek-v4.1-flash",
   "provider": {
     "openrouter": {
-      "options": { "apiKey": "{env:OPENROUTER_API_KEY}" },
       "models": { "deepseek/deepseek-v4.1-flash": {} }
     }
   },

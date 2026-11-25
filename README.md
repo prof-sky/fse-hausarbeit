@@ -102,14 +102,16 @@ Voraussetzungen auf dem Rechner: Git, Docker, Python und OpenCode.
 
 ## Schritt 3: OpenCode mit dem Schlüssel starten
 
+OpenCode läuft nur auf dem eigenen Rechner. Der Schlüssel wird dort einmalig
+hinterlegt:
+
 ```bash
-export OPENROUTER_API_KEY=sk-or-v1-...    # Schlüssel nur so setzen, nie in eine Datei
-opencode
+opencode auth login      # OpenRouter wählen, Schlüssel einfügen
 ```
 
-OpenCode aus demselben Terminal starten, in dem der Schlüssel gesetzt wurde.
-Alternativ einmalig `opencode auth login` ausführen, OpenRouter wählen und den
-Schlüssel einfügen. Modell und Rechte sind in `opencode.jsonc` schon passend
+OpenCode speichert ihn in seinen eigenen Einstellungen, außerhalb des
+Repositorys. Danach genügt es, im Ordner `fse-hausarbeit` einfach `opencode`
+zu starten. Modell und Rechte sind in `opencode.jsonc` schon passend
 eingestellt. OpenCode und das eigene Programm zahlen aus demselben Guthaben.
 
 ## Schritt 4: Das Chat-Programm mit OpenCode bauen
@@ -284,14 +286,27 @@ Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
 
 ## Schritt 5: Lokal bauen, starten und prüfen
 
-Nach jeder Änderung: in einem Terminal das Programm bauen und starten.
+Nach jeder Änderung in einem Terminal den Schlüssel setzen, das Programm bauen
+und starten. Der Schlüssel gilt nur in dem Terminal, in dem er gesetzt wurde.
+
+macOS, Linux, WSL:
 
 ```bash
+export OPENROUTER_API_KEY=sk-or-v1-...
 docker build -t mensch .
 docker run --rm -p 8080:8080 -e OPENROUTER_API_KEY mensch
 ```
 
-In einem zweiten Terminal die Regeln prüfen:
+Windows PowerShell:
+
+```powershell
+$env:OPENROUTER_API_KEY="sk-or-v1-..."
+docker build -t mensch .
+docker run --rm -p 8080:8080 -e OPENROUTER_API_KEY mensch
+```
+
+In einem zweiten Terminal die Regeln prüfen (unter macOS und Linux heißt der
+Befehl oft `python3`):
 
 ```bash
 python vertragstest.py
@@ -337,7 +352,8 @@ git push
 Nach jedem Hochladen baut GitHub das Image und lässt `vertragstest.py` laufen
 (Ablauf *Vertragstest*, Datei `pruefen.yml`). Ein grünes Häkchen neben dem
 Commit heißt: Die Regeln sind erfüllt. Ein rotes Kreuz → anklicken, dort steht,
-was fehlgeschlagen ist.
+was fehlgeschlagen ist. Solange Programm und `Dockerfile` noch nicht fertig
+sind, ist ein rotes Kreuz normal.
 
 ### Optional: Programm online stellen
 
@@ -360,7 +376,8 @@ an das Modell gehen auf das eigene Guthaben.
 - Die Persona in `persona.md` ausarbeiten; Alter, Beruf und Wohnort aus der
   persönlichen Vorgabe müssen dort stehen.
 - Eigene Testfragen in `eval/fragen.json` sammeln, mindestens 5 je Kategorie
-  (siehe *Was getestet wird*).
+  (siehe *Was getestet wird*). Das Format ist frei, es muss nur nachvollziehbar
+  sein, z. B. Kategorie, Frage und worauf bei der Antwort zu achten ist.
 - `eval/run_eval.py` stellt sie dem laufenden Programm; Antworten auswerten und
   notieren.
 - Eine Sache ändern, erneut messen, Ergebnis notieren. Jeden besseren Stand wie
