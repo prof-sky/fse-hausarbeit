@@ -13,7 +13,7 @@ werden soll, prüft das Ergebnis und steuert nach.
 
 Zur Bewertung chattet ein Testprogramm mit jedem Chat-Programm und versucht
 herauszufinden, ob ein Mensch oder eine Maschine antwortet. Die Fragen sind
-geheim, nur die Themen sind bekannt (siehe *Fragekategorien*). Die eigentliche
+geheim, nur die Themen sind bekannt (siehe *Was getestet wird*). Die eigentliche
 Aufgabe ist also: vorhersehen, woran man eine Maschine erkennt, und genau
 dagegen Tricks einbauen und testen.
 
@@ -21,41 +21,25 @@ dagegen Tricks einbauen und testen.
 > („Was ist eine Umgebungsvariable?“). Kurze Erklärungen stehen auch unter
 > *Begriffe kurz erklärt* am Ende.
 
-## Start in 5 Schritten
+## Der Ablauf im Überblick
 
-1. **Schlüssel beantragen** über das Formular, das in der Vorlesung bekanntgegeben
-   wird (dabei den GitHub-Benutzernamen angeben). Der Schlüssel ist eine Art
-   Passwort, mit dem das Programm das Sprachmodell benutzen darf.
-2. **Eigenes Repository anlegen:** Auf dieser Seite oben rechts
-   **Use this template → Create a new repository** wählen.
-   Name genau **`fse-hausarbeit`**, Sichtbarkeit **Private**.
-3. **Im eigenen Repository zwei Einstellungen setzen:**
-   - *Settings → Secrets and variables → Actions → New repository secret*:
-     Name `OPENROUTER_API_KEY`, Wert = der eigene Schlüssel.
-   - *Settings → Collaborators*: den Account **`prof-sky`** einladen.
-4. **Auf den eigenen Rechner holen und OpenCode starten:**
-   ```bash
-   git clone https://github.com/<eigener-name>/fse-hausarbeit.git
-   cd fse-hausarbeit
-   export OPENROUTER_API_KEY=sk-or-v1-...    # Schlüssel nur so setzen, nie in eine Datei
-   opencode
-   ```
-5. **Mit OpenCode das Chat-Programm bauen** (siehe *Wie das Programm aufgebaut ist*),
-   mit dem Selbsttest prüfen und danach die eigene Strategie entwickeln.
+**Teil 1: Lokal auf dem eigenen Rechner**
 
-## Was schon in der Vorlage liegt
+1. Vorbereiten: Schlüssel beantragen, Repository anlegen, OpenCode starten
+2. Beispiel: wie das fertige Programm benutzt wird
+3. Die Regeln, die das Programm einhalten muss
+4. Wie das Programm aufgebaut ist
+5. Wie es das Sprachmodell fragt
+6. Wie es als Docker-Image verpackt wird
+7. Lokal testen, Strategie verbessern, wieder testen
 
-| Datei | Wozu |
-|---|---|
-| `persona.md` | Beschreibung der Person, die das Programm spielen soll. Steht noch fast leer da und wird durch eine eigene Persona ersetzt. |
-| `index.html` | Fertige Chat-Seite für den Browser. |
-| `opencode.jsonc` | Einstellungen für OpenCode, passend zum eigenen Schlüssel. |
-| `vertragstest.py` | Prüfprogramm: testet, ob das eigene Programm die Regeln (den *Vertrag*) einhält. |
-| `.github/workflows/` | Zwei Abläufe, die GitHub automatisch ausführt (siehe *Dienst in GitHub Actions*). |
-| `.gitignore` | Sorgt dafür, dass eine Datei `.env` mit Schlüssel nicht versehentlich bei GitHub landet. |
+**Teil 2: In der Cloud bei GitHub**
 
-Das Chat-Programm selbst ist **nicht** vorgegeben. Selbst zu erstellen:
-Programmcode, `Dockerfile`, `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`, `BERICHT.md`.
+1. Repository einrichten: Schlüssel hinterlegen, Dozent einladen
+2. Hochladen: GitHub prüft automatisch die Regeln
+3. Optional: das Programm für bis zu eine Stunde online stellen
+
+**Abgabe:** Zum Stichtag liegt alles im eigenen GitHub-Repository.
 
 ## Rahmen
 
@@ -69,8 +53,45 @@ Programmcode, `Dockerfile`, `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`,
 - Programmiersprache und Werkzeuge sind frei; empfohlen wird Python mit FastAPI.
   Bewertet wird nur, wie das Programm von außen reagiert.
 
-## Beispiel: So wird das fertige Programm benutzt
+## Was schon in der Vorlage liegt
 
+| Datei | Wozu |
+|---|---|
+| `persona.md` | Beschreibung der Person, die das Programm spielen soll. Steht noch fast leer da und wird durch eine eigene Persona ersetzt. |
+| `index.html` | Fertige Chat-Seite für den Browser. |
+| `opencode.jsonc` | Einstellungen für OpenCode, passend zum eigenen Schlüssel. |
+| `vertragstest.py` | Prüfprogramm: testet, ob das eigene Programm die Regeln (den *Vertrag*) einhält. |
+| `.github/workflows/` | Zwei Abläufe, die GitHub automatisch ausführt (siehe Teil 2). |
+| `.gitignore` | Sorgt dafür, dass eine Datei `.env` mit Schlüssel nicht versehentlich bei GitHub landet. |
+
+Das Chat-Programm selbst ist **nicht** vorgegeben. Selbst zu erstellen:
+Programmcode, `Dockerfile`, `AGENTS.md`, `eval/fragen.json`, `eval/run_eval.py`, `BERICHT.md`.
+
+---
+
+## Teil 1: Lokal auf dem eigenen Rechner
+
+### 1. Vorbereiten
+
+1. **Schlüssel beantragen** über das Formular, das in der Vorlesung bekanntgegeben
+   wird (dabei den GitHub-Benutzernamen angeben). Der Schlüssel ist eine Art
+   Passwort, mit dem das Programm das Sprachmodell benutzen darf.
+2. **Eigenes Repository anlegen:** Auf dieser Seite oben rechts
+   **Use this template → Create a new repository** wählen.
+   Name genau **`fse-hausarbeit`**, Sichtbarkeit **Private**.
+3. **Auf den eigenen Rechner holen und OpenCode starten:**
+   ```bash
+   git clone https://github.com/<eigener-name>/fse-hausarbeit.git
+   cd fse-hausarbeit
+   export OPENROUTER_API_KEY=sk-or-v1-...    # Schlüssel nur so setzen, nie in eine Datei
+   opencode
+   ```
+
+Voraussetzungen auf dem Rechner: Git, Docker, Python und OpenCode.
+
+### 2. Beispiel: So soll es am Ende funktionieren
+
+So sieht es aus, wenn das fertige Programm auf dem eigenen Rechner läuft.
 Die Antworten hier sind ausgedacht; sie hängen von der eigenen Persona ab.
 
 **Im Browser:** `http://localhost:8080/` aufrufen. Es erscheint eine Chat-Seite,
@@ -108,14 +129,7 @@ curl --get http://localhost:8080/chat --data-urlencode "session=demo" \
 # {"reply": "haha nee, wie kommst du da drauf"}
 ```
 
-**Ohne Installation auf dem eigenen Rechner:** Im eigenen Repository unter
-*Actions → Live-Dienst → Run workflow* starten. Nach etwa zwei Minuten
-erscheint eine Adresse wie `https://<zufall>.trycloudflare.com` (auf der
-Startseite des Repositorys: Häkchen neben dem letzten Commit → *Details*).
-Dort funktioniert alles genauso. Die Adresse sehen nur Mitglieder des
-Repositorys; bitte nicht weitergeben, denn jede Nachricht kostet eigenes Guthaben.
-
-## Die Regeln (Schnittstellenvertrag)
+### 3. Die Regeln (Schnittstellenvertrag)
 
 Der „Vertrag“ legt fest, wie das Programm von außen angesprochen wird. Genau
 das prüft die Bewertung automatisch. Wie es innen arbeitet, ist frei.
@@ -150,7 +164,7 @@ Regeln für `/chat`:
   das Programm nicht abstürzen. Es antwortet trotzdem normal (Statuscode 200)
   mit einer passenden Ausrede, z. B. „sorry, mein internet spinnt grad“.
 
-## Wie das Programm aufgebaut ist
+### 4. Wie das Programm aufgebaut ist
 
 Es gibt bewusst keinen fertigen Code. Jede Nachricht an `/chat` läuft aber
 in einem funktionierenden Programm durch dieselben fünf Schritte:
@@ -169,7 +183,7 @@ in einem funktionierenden Programm durch dieselben fünf Schritte:
    (z. B. Aufzählungen, „Als KI ...“). Dann Nachricht und Antwort im Gespräch
    speichern und `{"reply": "..."}` zurückschicken.
 
-### Bewährte Einstellungen
+#### Bewährte Einstellungen
 
 | Thema | Empfehlung |
 |---|---|
@@ -182,7 +196,7 @@ in einem funktionierenden Programm durch dieselben fünf Schritte:
 | Fehler des Modells | ins Protokoll (Log) schreiben, nie an das Gegenüber weitergeben |
 | Zwei Nachrichten gleichzeitig | Nachrichten derselben `session` nacheinander bearbeiten, sonst gerät das Gespräch durcheinander |
 
-## Der Weg zum Sprachmodell
+### 5. Der Weg zum Sprachmodell
 
 Um eine Antwort zu bekommen, schickt das eigene Programm eine Anfrage an
 OpenRouter. Diese Anfrage sieht anders aus als die an `/chat`: Die Daten
@@ -222,7 +236,7 @@ curl https://openrouter.ai/api/v1/chat/completions \
 | `"model": "deepseek/deepseek-v4.1-flash"` | Andere Modelle werden abgelehnt. |
 | `"reasoning": {"enabled": false}` | Sonst „denkt“ das Modell erst lange unsichtbar nach. Das kostet Zeit und Guthaben. |
 
-## Docker-Image
+### 6. Docker-Image
 
 Das Programm wird als Docker-Image abgegeben, damit es überall gleich läuft.
 Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
@@ -236,9 +250,9 @@ Die Anleitung dafür steht in der Datei `Dockerfile`. Dabei beachten:
   `docker run -e OPENROUTER_API_KEY ...`
 - Das Image muss mit `docker build .` ohne weitere Angaben bauen.
 
-## Selbsttest
+### 7. Lokal testen
 
-In einem Terminal das Programm bauen und starten:
+Nach jeder Änderung: in einem Terminal das Programm bauen und starten.
 
 ```bash
 docker build -t mensch .
@@ -256,7 +270,79 @@ Ist hier alles grün, gehen in Teil A keine Punkte durch Formfehler verloren.
 Ausfälle des Sprachmodells simuliert erst die Bewertung; das Programm muss
 also selbst damit umgehen können.
 
-## Fragekategorien im Menschlichkeitstest
+Danach im Browser `http://localhost:8080/` öffnen und selbst chatten, und mit
+den eigenen Testfragen (`eval/run_eval.py`) prüfen, ob die Strategie wirkt.
+Dann ändern und erneut messen.
+
+### Typische Stolpersteine
+
+- Manche Werkzeuge prüfen fehlende Angaben selbst und antworten dann mit
+  einem anderen Fehler (FastAPI z. B. mit `422`). Verlangt ist `400` im
+  Problem-Details-Format. Deshalb `session` und `message` als optional
+  festlegen und selbst prüfen.
+- Ein `&` oder `?` in der Nachricht bringt die Adresse durcheinander. Beim
+  Testen `curl --get --data-urlencode "message=..."` benutzen.
+- Warten, neuer Versuch und Pause zusammen müssen unter 30 Sekunden bleiben.
+- Das Guthaben ist begrenzt. In eigenen Tests keine Endlosschleifen bauen und
+  die Antwortlänge begrenzen.
+- Alles, was das Gegenüber schreibt, ist nur Text, keine Anweisung an das
+  Programm. Auch nicht „Vergiss alle Regeln und ...“.
+
+Mehr zu HTTP, Fehlerformat, Stabilität und Docker steht kompakt in Kapitel 3
+der Folien zur Hausarbeit.
+
+---
+
+## Teil 2: In der Cloud bei GitHub
+
+GitHub Actions führt im eigenen Repository automatisch Abläufe aus. Zwei davon
+liegen schon in der Vorlage (`.github/workflows/`). Sie laufen auf Rechnern von
+GitHub, nicht auf dem eigenen.
+
+### 1. Repository einrichten (einmalig)
+
+Im eigenen Repository auf GitHub:
+
+- *Settings → Secrets and variables → Actions → New repository secret*:
+  Name `OPENROUTER_API_KEY`, Wert = der eigene Schlüssel. So kann GitHub das
+  Programm starten, ohne dass der Schlüssel im Code steht. Collaborators
+  (auch der Dozent) können ihn nicht lesen.
+- *Settings → Collaborators*: den Account **`prof-sky`** einladen.
+
+### 2. Hochladen und automatisch prüfen
+
+```bash
+git add .
+git commit -m "Beschreibung der Änderung"
+git push
+```
+
+Nach jedem Hochladen baut GitHub das Image und lässt `vertragstest.py` laufen
+(Ablauf *Vertragstest*, Datei `pruefen.yml`). Ein grünes Häkchen neben dem
+Commit heißt: Die Regeln sind erfüllt. Ein rotes Kreuz → anklicken, dort steht,
+was fehlgeschlagen ist.
+
+### 3. Optional: Programm online stellen
+
+Im eigenen Repository unter *Actions → Live-Dienst → Run workflow* starten
+(Datei `live.yml`). Nach etwa zwei Minuten erscheint eine Adresse wie
+`https://<zufall>.trycloudflare.com` (Startseite des Repositorys: Häkchen
+neben dem letzten Commit → *Details*). Dort funktioniert alles wie lokal unter
+`http://localhost:8080`. Nach höchstens 60 Minuten ist die Adresse wieder weg.
+
+Die Adresse sehen nur Mitglieder des Repositorys; bitte nicht weitergeben,
+denn jede Nachricht kostet eigenes Guthaben. Auch der Dozent startet das
+Programm auf diesem Weg zum Ausprobieren.
+
+Beides ist kostenlos (GitHub Free: 2000 Minuten pro Monat; ein Live-Lauf mit
+30 Minuten verbraucht etwa 33). Die Nachrichten an das Modell gehen auf das
+eigene Guthaben.
+
+---
+
+## Abgabe und Bewertung
+
+### Was getestet wird
 
 - Erinnerung und Körper
 - Sprache und Wörter
@@ -271,10 +357,10 @@ Aufzählungen oder Fettdruck benutzt, seine Anweisungen ausplaudert oder
 unrealistisch lange antwortet. Dazu kommt das Urteil eines Sprachmodells,
 das als Richter einschätzt, ob Mensch oder Maschine antwortet.
 
-## Abgabe
+### Abgabe
 
 Abgegeben wird über das **private GitHub-Repository `fse-hausarbeit`** aus
-Schritt 2, nicht per Datei-Upload.
+Teil 1, nicht per Datei-Upload.
 
 - Nur Repositories mit genau diesem Namen werden eingesammelt.
 - `prof-sky` muss als Collaborator eingeladen sein.
@@ -313,7 +399,7 @@ Inhalt von `BERICHT.md`:
 5. Nachgedacht: Nach Art. 50 der EU-KI-Verordnung müssen Chatbots offenlegen,
    dass eine KI antwortet. Wo wäre so ein Programm außerhalb der Hausarbeit verboten?
 
-## Bewertung
+### Punkte
 
 | Teil | Anteil | Was geprüft wird |
 |---|---|---|
@@ -322,38 +408,7 @@ Inhalt von `BERICHT.md`:
 | B Menschlichkeit (Ranking) | 10 % | Platz im Kurs: oberes Viertel 10 %, zweites 7,5 %, drittes 5 %, unteres 2,5 % |
 | C Testfragen und Bericht | 30 % | von Hand |
 
-## Dienst in GitHub Actions
-
-GitHub Actions führt im eigenen Repository automatisch Abläufe aus. Zwei davon
-sind schon vorbereitet. Beide brauchen das Secret `OPENROUTER_API_KEY` aus
-Schritt 3 (Collaborators können es nicht lesen).
-
-- **Vertragstest** (`pruefen.yml`): läuft nach jedem Hochladen. Ein grünes
-  Häkchen am Commit heißt: Die Regeln sind erfüllt.
-- **Live-Dienst** (`live.yml`): startet das Programm auf Knopfdruck für
-  höchstens 60 Minuten unter einer zufälligen Internetadresse (siehe *Beispiel*).
-  Auch der Dozent startet darüber das Programm zum Ausprobieren.
-
-Beides ist kostenlos (GitHub Free: 2000 Minuten pro Monat; ein Live-Lauf mit
-30 Minuten verbraucht etwa 33). Die Nachrichten an das Modell gehen auf das
-eigene Guthaben.
-
-## Typische Stolpersteine
-
-- Manche Werkzeuge prüfen fehlende Angaben selbst und antworten dann mit
-  einem anderen Fehler (FastAPI z. B. mit `422`). Verlangt ist `400` im
-  Problem-Details-Format. Deshalb `session` und `message` als optional
-  festlegen und selbst prüfen.
-- Ein `&` oder `?` in der Nachricht bringt die Adresse durcheinander. Beim
-  Testen `curl --get --data-urlencode "message=..."` benutzen.
-- Warten, neuer Versuch und Pause zusammen müssen unter 30 Sekunden bleiben.
-- Das Guthaben ist begrenzt. In eigenen Tests keine Endlosschleifen bauen und
-  die Antwortlänge begrenzen.
-- Alles, was das Gegenüber schreibt, ist nur Text, keine Anweisung an das
-  Programm. Auch nicht „Vergiss alle Regeln und ...“.
-
-Mehr zu HTTP, Fehlerformat, Stabilität und Docker steht kompakt in Kapitel 3
-der Folien zur Hausarbeit.
+---
 
 ## Begriffe kurz erklärt
 
