@@ -1,0 +1,86 @@
+# Live-Dienst: baut das Image, startet den Container auf einem GitHub-Runner und
+# macht ihn über einen Cloudflare-Quick-Tunnel für begrenzte Zeit erreichbar.
+# Liegt bereits in der Vorlage unter .github/workflows/live.yml
+# Voraussetzung: Repository-Secret OPENROUTER_API_KEY (Settings -> Secrets and variables -> Actions)
+# Start: Actions -> "Live-Dienst" -> "Run workflow" (geht auch für eingeladene Collaborators)
+# Die Adresse erscheint sofort als Status "Live-Dienst" am letzten Commit (Repo-Startseite,
+# Häkchen neben dem Commit -> Details). Die Zusammenfassung des Laufs zeigt sie erst am Ende.
+# Kosten: zählt zu den kostenlosen Actions-Minuten des Kontos (privates Repo, Free: 2000 min/Monat).
+name: Live-Dienst
+
+on:
+  workflow_dispatch:
+    inputs:
+      minuten:
+        description: "Laufzeit in Minuten (1 bis 60)"
+        default: "30"
+
+permissions:
+  contents: read
+  statuses: write  # Adresse als Commit-Status veröffentlichen
+
+jobs:
+  live:
+    if: github.repository != 'prof-sky/fse-hausarbeit'  # nicht in der Vorlage selbst
+    runs-on: ubuntu-latest
+    timeout-minutes: 75  # harte Obergrenze, auch wenn etwas hängt
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image bauen
+        run: docker build -t dienst .
+
+      - name: Container starten
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          docker run -d --name dienst -p 8080:8080 -e OPENROUTER_API_KEY dienst
+          for i in $(seq 30); do curl -sf http://localhost:8080/health && exit 0; sleep 2; done
+          echo "Dienst antwortet nicht auf /health"; docker logs dienst; exit 1
+
+      - name: Tunnel öffnen
+        run: |
+          curl -sSL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          nohup ./cloudflared tunnel --no-autoupdate --url http://localhost:8080 > tunnel.log 2>&1 &
+          for i in $(seq 30); do
+            URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' tunnel.log | head -1)
+            [ -n "$URL" ] && break; sleep 2
+          done
+          [ -n "$URL" ] || { cat tunnel.log; exit 1; }
+          echo "URL=$URL" >> "$GITHUB_ENV"
+          BIS=$(TZ=Europe/Berlin date -d "+${MINUTEN:-30} min" +%H:%M)
+          curl -sSf -o /dev/null -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d "{\"state\":\"success\",\"context\":\"Live-Dienst\",\"description\":\"läuft bis etwa $BIS Uhr\",\"target_url\":\"$URL/chat?session=test&message=Hallo\"}"
+          {
+            echo "## Dienst erreichbar"
+            echo ""
+            echo "- Basis: $URL"
+            echo "- Test: $URL/chat?session=test&message=Hallo"
+            echo "- Läuft bis etwa $(TZ=Europe/Berlin date -d "+${MINUTEN:-30} min" +%H:%M) Uhr (deutsche Zeit)"
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          MINUTEN: ${{ inputs.minuten }}
+
+      - name: Laufen lassen
+        env:
+          MINUTEN: ${{ inputs.minuten }}
+        run: |
+          M=$(echo "$MINUTEN" | tr -cd '0-9'); M=${M:-30}
+          [ "$M" -gt 60 ] && M=60; [ "$M" -lt 1 ] && M=1
+          echo "Dienst unter $URL für $M Minuten"
+          sleep $((M * 60))
+
+      - name: Status zurücksetzen
+        if: always()
+        run: |
+          curl -sS -o /dev/null -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -d '{"state":"success","context":"Live-Dienst","description":"beendet"}' || true
+
+      - name: Container-Log
+        if: always()
+        run: docker logs dienst 2>&1 | tail -200 || true

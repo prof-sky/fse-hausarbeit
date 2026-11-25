@@ -1,0 +1,30 @@
+// opencode.jsonc für die Hausarbeit "Mensch oder Maschine" (Pflichtwerkzeug: OpenCode)
+// Liegt bereits im Wurzelverzeichnis der Vorlage; bei Bedarf erweitern.
+// Der OpenRouter-Schlüssel aus der Hausarbeit gilt nur für deepseek/deepseek-v4.1-flash;
+// jedes andere Modell wird von OpenRouter abgelehnt. Deshalb ist auch "small_model"
+// (Titel, Zusammenfassungen) auf dieses Modell gesetzt.
+// Schlüssel nur als Umgebungsvariable setzen: export OPENROUTER_API_KEY=sk-or-v1-...
+// Berechtigungen im Format V2 wie in FSE_LLM_2; bei älteren OpenCode-Versionen
+// heißt der Schlüssel "permission" (Objekt).
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/deepseek/deepseek-v4.1-flash",
+  "small_model": "openrouter/deepseek/deepseek-v4.1-flash",
+  "provider": {
+    "openrouter": {
+      "options": { "apiKey": "{env:OPENROUTER_API_KEY}" },
+      "models": { "deepseek/deepseek-v4.1-flash": {} }
+    }
+  },
+  "instructions": ["AGENTS.md"],
+  "permissions": [
+    { "action": "shell", "resource": "*",                 "effect": "ask"   },
+    { "action": "shell", "resource": "git status *",      "effect": "allow" },
+    { "action": "shell", "resource": "git diff *",        "effect": "allow" },
+    { "action": "shell", "resource": "docker build *",    "effect": "allow" },
+    { "action": "shell", "resource": "python vertragstest.py *", "effect": "allow" },
+    { "action": "shell", "resource": "pip install *",     "effect": "ask"   },
+    { "action": "shell", "resource": "git push *",        "effect": "deny"  },
+    { "action": "read",  "resource": "*.env",             "effect": "deny"  }
+  ]
+}
